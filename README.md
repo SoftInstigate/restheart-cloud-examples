@@ -2,6 +2,8 @@
 
 This monorepo contains example frontend applications that demonstrate how to build web applications using RESTHeart Cloud as a backend.
 
+<img width="842" height="677" alt="immagine" src="https://github.com/user-attachments/assets/737bef3d-6801-4aff-b89c-c3458ade3495" />
+
 ## Examples
 
 This repository includes three implementations of a Product Search application, each using a different frontend framework:
