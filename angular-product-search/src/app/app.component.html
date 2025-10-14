@@ -1,0 +1,81 @@
+<div class="app">
+  <header>
+    <h1>🛍️ Product Search</h1>
+    <p class="subtitle">Powered by RESTHeart Cloud</p>
+  </header>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label for="search">Search by name:</label>
+      <input
+        id="search"
+        type="text"
+        placeholder="Enter product name..."
+        [(ngModel)]="searchTerm"
+        (input)="fetchProducts()"
+      />
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="minPrice">Min Price:</label>
+        <input
+          id="minPrice"
+          type="number"
+          placeholder="0"
+          [(ngModel)]="minPrice"
+          (input)="fetchProducts()"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="maxPrice">Max Price:</label>
+        <input
+          id="maxPrice"
+          type="number"
+          placeholder="1000"
+          [(ngModel)]="maxPrice"
+          (input)="fetchProducts()"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="category">Category:</label>
+        <select
+          id="category"
+          [(ngModel)]="selectedCategory"
+          (change)="fetchProducts()"
+        >
+          <option value="">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat">
+            {{ cat }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <button (click)="resetFilters()" class="reset-btn">Reset Filters</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading products...</div>
+  <div *ngIf="error" class="error">Error: {{ error }}</div>
+  <div *ngIf="!loading && !error && products.length === 0" class="no-results">
+    No products found. Try adjusting your filters.
+  </div>
+  <div *ngIf="!loading && !error && products.length > 0" class="products-grid">
+    <div *ngFor="let product of products" class="product-card">
+      <h3>{{ product.name }}</h3>
+      <p class="price">${{ product.price?.toFixed(2) }}</p>
+      <p class="category">{{ product.category }}</p>
+      <p class="description">{{ product.description }}</p>
+      <div *ngIf="product.features" class="features">
+        <span *ngFor="let feature of product.features" class="feature">
+          {{ feature }}
+        </span>
+      </div>
+      <p class="stock" [class.out-of-stock]="!product.inStock">
+        {{ product.inStock ? 'In Stock (' + product.quantity + ')' : 'Out of Stock' }}
+      </p>
+    </div>
+  </div>
+</div>
