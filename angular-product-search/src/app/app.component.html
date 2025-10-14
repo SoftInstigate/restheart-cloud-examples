@@ -65,7 +65,7 @@
   <div *ngIf="!loading && !error && products.length > 0" class="products-grid">
     <div *ngFor="let product of products" class="product-card">
       <h3>{{ product.name }}</h3>
-      <p class="price">${{ product.price?.toFixed(2) }}</p>
+      <p class="price">${{ product.price.toFixed(2) }}</p>
       <p class="category">{{ product.category }}</p>
       <p class="description">{{ product.description }}</p>
       <div *ngIf="product.features" class="features">

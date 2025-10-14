@@ -1,7 +1,7 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
-const restHeartUrl = import.meta.env.VITE_RESTHEART_URL || 'https://beta.mrest.it'
+const restHeartUrl = import.meta.env.VITE_RESTHEART_URL || 'https://your-srv-id.restheart.com'
 const products = ref([])
 const loading = ref(false)
 const error = ref(null)
@@ -10,41 +10,44 @@ const minPrice = ref('')
 const maxPrice = ref('')
 const selectedCategory = ref('')
 const categories = ref([])
+let debounceTimeout = null
 
-const fetchProducts = async () => {
-  loading.value = true
+const fetchProducts = async (isInitialLoad = false) => {
+  if (isInitialLoad) {
+    loading.value = true
+  }
   error.value = null
-  
+
   try {
     let filterObj = {}
-    
+
     if (searchTerm.value) {
       filterObj.name = { $regex: searchTerm.value, $options: 'i' }
     }
-    
+
     if (minPrice.value || maxPrice.value) {
       filterObj.price = {}
       if (minPrice.value) filterObj.price.$gte = parseFloat(minPrice.value)
       if (maxPrice.value) filterObj.price.$lte = parseFloat(maxPrice.value)
     }
-    
+
     if (selectedCategory.value) {
       filterObj.category = selectedCategory.value
     }
-    
-    const filter = Object.keys(filterObj).length > 0 
+
+    const filter = Object.keys(filterObj).length > 0
       ? `?filter=${encodeURIComponent(JSON.stringify(filterObj))}&sort={"price":1}`
       : '?sort={"price":1}'
-    
+
     const response = await fetch(`${restHeartUrl}/products${filter}`)
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     const data = await response.json()
     products.value = data
-    
+
     // Extract unique categories
     const uniqueCategories = [...new Set(data.map(p => p.category).filter(Boolean))]
     categories.value = uniqueCategories
@@ -52,8 +55,19 @@ const fetchProducts = async () => {
     error.value = err.message
     console.error('Error fetching products:', err)
   } finally {
-    loading.value = false
+    if (isInitialLoad) {
+      loading.value = false
+    }
   }
+}
+
+const debouncedFetchProducts = () => {
+  if (debounceTimeout) {
+    clearTimeout(debounceTimeout)
+  }
+  debounceTimeout = setTimeout(() => {
+    fetchProducts(false)
+  }, 300)
 }
 
 const resetFilters = () => {
@@ -61,11 +75,14 @@ const resetFilters = () => {
   minPrice.value = ''
   maxPrice.value = ''
   selectedCategory.value = ''
-  fetchProducts()
 }
 
+watch([searchTerm, minPrice, maxPrice, selectedCategory], () => {
+  debouncedFetchProducts()
+})
+
 onMounted(() => {
-  fetchProducts()
+  fetchProducts(true)
 })
 </script>
 
@@ -84,7 +101,6 @@ onMounted(() => {
           v-model="searchTerm"
           type="text"
           placeholder="Enter product name..."
-          @input="fetchProducts"
         />
       </div>
 
@@ -96,7 +112,6 @@ onMounted(() => {
             v-model="minPrice"
             type="number"
             placeholder="0"
-            @input="fetchProducts"
           />
         </div>
 
@@ -107,7 +122,6 @@ onMounted(() => {
             v-model="maxPrice"
             type="number"
             placeholder="1000"
-            @input="fetchProducts"
           />
         </div>
 
@@ -116,7 +130,6 @@ onMounted(() => {
           <select
             id="category"
             v-model="selectedCategory"
-            @change="fetchProducts"
           >
             <option value="">All Categories</option>
             <option v-for="cat in categories" :key="cat" :value="cat">
@@ -168,8 +181,10 @@ body {
 }
 
 .app {
-  max-width: 1200px;
+  max-width: 980px;
+  width: 100%;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 header {
@@ -336,15 +351,15 @@ header h1 {
   body {
     padding: 1rem;
   }
-  
+
   header h1 {
     font-size: 2rem;
   }
-  
+
   .filter-row {
     grid-template-columns: 1fr;
   }
-  
+
   .products-grid {
     grid-template-columns: 1fr;
   }

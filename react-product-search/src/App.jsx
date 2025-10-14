@@ -1,77 +1,92 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
-  const restHeartUrl = import.meta.env.VITE_RESTHEART_URL || 'https://beta.mrest.it'
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [minPrice, setMinPrice] = useState('')
-  const [maxPrice, setMaxPrice] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('')
-  const [categories, setCategories] = useState([])
+  const restHeartUrl =
+    import.meta.env.VITE_RESTHEART_URL ||
+    "5d9bb1.eu-central-1-free-1.restheart.com";
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [categories, setCategories] = useState([]);
 
-  const fetchProducts = async () => {
-    setLoading(true)
-    setError(null)
-    
-    try {
-      let filterObj = {}
-      
-      if (searchTerm) {
-        filterObj.name = { $regex: searchTerm, $options: 'i' }
-      }
-      
-      if (minPrice || maxPrice) {
-        filterObj.price = {}
-        if (minPrice) filterObj.price.$gte = parseFloat(minPrice)
-        if (maxPrice) filterObj.price.$lte = parseFloat(maxPrice)
-      }
-      
-      if (selectedCategory) {
-        filterObj.category = selectedCategory
-      }
-      
-      const filter = Object.keys(filterObj).length > 0 
-        ? `?filter=${encodeURIComponent(JSON.stringify(filterObj))}&sort={"price":1}`
-        : '?sort={"price":1}'
-      
-      const response = await fetch(`${restHeartUrl}/products${filter}`)
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      
-      const data = await response.json()
-      setProducts(data)
-      
-      // Extract unique categories
-      const uniqueCategories = [...new Set(data.map(p => p.category).filter(Boolean))]
-      setCategories(uniqueCategories)
-    } catch (err) {
-      setError(err.message)
-      console.error('Error fetching products:', err)
-    } finally {
-      setLoading(false)
+  const fetchProducts = async (isInitialLoad = false) => {
+    if (isInitialLoad) {
+      setLoading(true);
     }
-  }
+    setError(null);
+
+    try {
+      let filterObj = {};
+
+      if (searchTerm) {
+        filterObj.name = { $regex: searchTerm, $options: "i" };
+      }
+
+      if (minPrice || maxPrice) {
+        filterObj.price = {};
+        if (minPrice) filterObj.price.$gte = parseFloat(minPrice);
+        if (maxPrice) filterObj.price.$lte = parseFloat(maxPrice);
+      }
+
+      if (selectedCategory) {
+        filterObj.category = selectedCategory;
+      }
+
+      const filter =
+        Object.keys(filterObj).length > 0
+          ? `?filter=${encodeURIComponent(JSON.stringify(filterObj))}&sort={"price":1}`
+          : '?sort={"price":1}';
+
+      const response = await fetch(`${restHeartUrl}/products${filter}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setProducts(data);
+
+      // Extract unique categories
+      const uniqueCategories = [
+        ...new Set(data.map((p) => p.category).filter(Boolean)),
+      ];
+      setCategories(uniqueCategories);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching products:", err);
+    } finally {
+      if (isInitialLoad) {
+        setLoading(false);
+      }
+    }
+  };
 
   const resetFilters = () => {
-    setSearchTerm('')
-    setMinPrice('')
-    setMaxPrice('')
-    setSelectedCategory('')
-    fetchProducts()
-  }
+    setSearchTerm("");
+    setMinPrice("");
+    setMaxPrice("");
+    setSelectedCategory("");
+    fetchProducts();
+  };
 
   useEffect(() => {
-    fetchProducts()
-  }, [])
+    const isInitialLoad =
+      !searchTerm && !minPrice && !maxPrice && !selectedCategory;
 
-  useEffect(() => {
-    fetchProducts()
-  }, [searchTerm, minPrice, maxPrice, selectedCategory])
+    const timeoutId = setTimeout(
+      () => {
+        fetchProducts(isInitialLoad);
+      },
+      isInitialLoad ? 0 : 300,
+    );
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, minPrice, maxPrice, selectedCategory]);
 
   return (
     <div className="app">
@@ -161,17 +176,17 @@ function App() {
                   ))}
                 </div>
               )}
-              <p className={`stock ${!product.inStock ? 'out-of-stock' : ''}`}>
+              <p className={`stock ${!product.inStock ? "out-of-stock" : ""}`}>
                 {product.inStock
                   ? `In Stock (${product.quantity})`
-                  : 'Out of Stock'}
+                  : "Out of Stock"}
               </p>
             </div>
           ))}
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
