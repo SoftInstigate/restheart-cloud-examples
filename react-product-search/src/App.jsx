@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 
 function App() {
@@ -14,64 +14,66 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState([]);
 
-  const fetchProducts = async (isInitialLoad = false) => {
-    if (isInitialLoad) {
-      setLoading(true);
-    }
-    setError(null);
-
-    try {
-      let filterObj = {};
-
-      if (searchTerm) {
-        filterObj.name = { $regex: searchTerm, $options: "i" };
-      }
-
-      if (minPrice || maxPrice) {
-        filterObj.price = {};
-        if (minPrice) filterObj.price.$gte = parseFloat(minPrice);
-        if (maxPrice) filterObj.price.$lte = parseFloat(maxPrice);
-      }
-
-      if (selectedCategory) {
-        filterObj.category = selectedCategory;
-      }
-
-      const filter =
-        Object.keys(filterObj).length > 0
-          ? `?filter=${encodeURIComponent(JSON.stringify(filterObj))}&sort={"price":1}`
-          : '?sort={"price":1}';
-
-      const response = await fetch(`${restHeartUrl}/products${filter}`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setProducts(data);
-
-      // Extract unique categories
-      const uniqueCategories = [
-        ...new Set(data.map((p) => p.category).filter(Boolean)),
-      ];
-      setCategories(uniqueCategories);
-    } catch (err) {
-      setError(err.message);
-      console.error("Error fetching products:", err);
-    } finally {
+  const fetchProducts = useCallback(
+    async (isInitialLoad = false) => {
       if (isInitialLoad) {
-        setLoading(false);
+        setLoading(true);
       }
-    }
-  };
+      setError(null);
+
+      try {
+        let filterObj = {};
+
+        if (searchTerm) {
+          filterObj.name = { $regex: searchTerm, $options: "i" };
+        }
+
+        if (minPrice || maxPrice) {
+          filterObj.price = {};
+          if (minPrice) filterObj.price.$gte = parseFloat(minPrice);
+          if (maxPrice) filterObj.price.$lte = parseFloat(maxPrice);
+        }
+
+        if (selectedCategory) {
+          filterObj.category = selectedCategory;
+        }
+
+        const filter =
+          Object.keys(filterObj).length > 0
+            ? `?filter=${encodeURIComponent(JSON.stringify(filterObj))}&sort={"price":1}`
+            : '?sort={"price":1}';
+
+        const response = await fetch(`${restHeartUrl}/products${filter}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setProducts(data);
+
+        // Extract unique categories
+        const uniqueCategories = [
+          ...new Set(data.map((p) => p.category).filter(Boolean)),
+        ];
+        setCategories(uniqueCategories);
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching products:", err);
+      } finally {
+        if (isInitialLoad) {
+          setLoading(false);
+        }
+      }
+    },
+    [searchTerm, minPrice, maxPrice, selectedCategory, restHeartUrl],
+  );
 
   const resetFilters = () => {
     setSearchTerm("");
     setMinPrice("");
     setMaxPrice("");
     setSelectedCategory("");
-    fetchProducts();
   };
 
   useEffect(() => {
@@ -86,7 +88,7 @@ function App() {
     );
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, minPrice, maxPrice, selectedCategory]);
+  }, [searchTerm, minPrice, maxPrice, selectedCategory, fetchProducts]);
 
   return (
     <div className="app">
