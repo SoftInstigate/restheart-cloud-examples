@@ -1,7 +1,7 @@
-import { Component, OnInit, signal, computed, effect } from "@angular/core";
+import { Component, signal, computed, effect, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { environment } from "../environments/environment";
 
 interface Product {
@@ -18,11 +18,13 @@ interface Product {
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
+  private http = inject(HttpClient);
+
   restHeartUrl = environment.restHeartUrl;
 
   // Signals for reactive state management
@@ -46,8 +48,10 @@ export class AppComponent implements OnInit {
     return uniqueCategories;
   });
 
-  constructor(private http: HttpClient) {
-    // Effect to fetch products whenever filter signals change
+  private debounceTimeout: number | null = null;
+
+  constructor() {
+    // Effect to fetch products whenever filter signals change with debounce
     effect(
       () => {
         // Read all filter signals to track dependencies
@@ -56,15 +60,18 @@ export class AppComponent implements OnInit {
         const max = this.maxPrice();
         const category = this.selectedCategory();
 
-        // Use untracked or allowSignalWrites to fetch products
-        this.fetchProducts();
+        // Clear previous timeout
+        if (this.debounceTimeout !== null) {
+          clearTimeout(this.debounceTimeout);
+        }
+
+        // Debounce the fetch with 300ms delay
+        this.debounceTimeout = setTimeout(() => {
+          this.fetchProducts();
+        }, 300) as any;
       },
       { allowSignalWrites: true },
     );
-  }
-
-  ngOnInit() {
-    // Initial fetch is handled by the effect
   }
 
   fetchProducts() {
