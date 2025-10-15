@@ -11,8 +11,8 @@
         id="search"
         type="text"
         placeholder="Enter product name..."
-        [(ngModel)]="searchTerm"
-        (input)="fetchProducts()"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
       />
     </div>
 
@@ -23,8 +23,8 @@
           id="minPrice"
           type="number"
           placeholder="0"
-          [(ngModel)]="minPrice"
-          (input)="fetchProducts()"
+          [ngModel]="minPrice()"
+          (ngModelChange)="minPrice.set($event)"
         />
       </div>
 
@@ -34,8 +34,8 @@
           id="maxPrice"
           type="number"
           placeholder="1000"
-          [(ngModel)]="maxPrice"
-          (input)="fetchProducts()"
+          [ngModel]="maxPrice()"
+          (ngModelChange)="maxPrice.set($event)"
         />
       </div>
 
@@ -43,11 +43,11 @@
         <label for="category">Category:</label>
         <select
           id="category"
-          [(ngModel)]="selectedCategory"
-          (change)="fetchProducts()"
+          [ngModel]="selectedCategory()"
+          (ngModelChange)="selectedCategory.set($event)"
         >
           <option value="">All Categories</option>
-          <option *ngFor="let cat of categories" [value]="cat">
+          <option *ngFor="let cat of categories()" [value]="cat">
             {{ cat }}
           </option>
         </select>
@@ -57,13 +57,13 @@
     <button (click)="resetFilters()" class="reset-btn">Reset Filters</button>
   </div>
 
-  <div *ngIf="loading" class="loading">Loading products...</div>
-  <div *ngIf="error" class="error">Error: {{ error }}</div>
-  <div *ngIf="!loading && !error && products.length === 0" class="no-results">
+  <div *ngIf="loading()" class="loading">Loading products...</div>
+  <div *ngIf="error()" class="error">Error: {{ error() }}</div>
+  <div *ngIf="!loading() && !error() && products().length === 0" class="no-results">
     No products found. Try adjusting your filters.
   </div>
-  <div *ngIf="!loading && !error && products.length > 0" class="products-grid">
-    <div *ngFor="let product of products" class="product-card">
+  <div *ngIf="!loading() && !error() && products().length > 0" class="products-grid">
+    <div *ngFor="let product of products()" class="product-card">
       <h3>{{ product.name }}</h3>
       <p class="price">${{ product.price.toFixed(2) }}</p>
       <p class="category">{{ product.category }}</p>
