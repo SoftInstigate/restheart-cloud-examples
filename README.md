@@ -151,7 +151,7 @@ GET /products?filter={"category":"electronics","price":{"$lte":200}}&sort={"pric
 
 - [RESTHeart Cloud Documentation](https://restheart.org/docs/cloud)
 - [RESTHeart Cloud Examples](https://restheart.org/docs/cloud/examples)
-- [API Reference](https://restheart.org/docs/v7/mongodb-rest)
+- [API Reference](https://restheart.org/docs/mongodb-rest/)
 
 ## License
 
