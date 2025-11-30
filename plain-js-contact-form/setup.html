@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backend Setup - RESTHeart Cloud</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <style>
+      .setup-info {
+        background: #f8f9fa;
+        border-left: 4px solid var(--primary-color);
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        border-radius: 4px;
+      }
+
+      .setup-info h3 {
+        margin-bottom: 12px;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+      }
+
+      .setup-info ol {
+        margin-left: 20px;
+        line-height: 1.8;
+      }
+
+      .setup-info li {
+        margin-bottom: 8px;
+      }
+
+      .setup-info a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .setup-info a:hover {
+        text-decoration: underline;
+      }
+
+      .setup-progress {
+        margin-top: 24px;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        display: none;
+      }
+
+      .setup-progress.active {
+        display: block;
+      }
+
+      .progress-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 0.95rem;
+      }
+
+      .progress-item .status {
+        margin-right: 12px;
+        font-size: 1.2rem;
+      }
+
+      .progress-item.pending .status::before {
+        content: "⏳";
+      }
+
+      .progress-item.success .status::before {
+        content: "✅";
+      }
+
+      .progress-item.error .status::before {
+        content: "❌";
+      }
+
+      .progress-item.running .status::before {
+        content: "⏳";
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .code-block {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 12px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        margin: 12px 0;
+        position: relative;
+      }
+
+      .copy-btn {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        background: #4a90e2;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+
+      .copy-btn:hover {
+        background: #357abd;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      .url-display {
+        background: #d4edda;
+        border: 1px solid #27ae60;
+        color: #155724;
+        padding: 16px;
+        border-radius: 8px;
+        margin-top: 16px;
+        display: none;
+      }
+
+      .url-display.active {
+        display: block;
+      }
+
+      .url-display h4 {
+        margin-bottom: 12px;
+        color: #27ae60;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Backend Setup</h1>
+        <p>Configure your RESTHeart Cloud backend</p>
+      </header>
+
+      <div class="form-container">
+        <div class="setup-info">
+          <h3>Setup Instructions</h3>
+          <ol>
+            <li>
+              Register at
+              <a href="https://cloud.restheart.com" target="_blank"
+                >cloud.restheart.com</a
+              >
+            </li>
+            <li>
+              Create a free service instance (you'll get a URL like
+              <code>https://acac36.eu-central-1-free-1.restheart.com</code>)
+            </li>
+            <li>
+              <strong>Edit <code>config.js</code></strong> and set your service
+              URL in the <code>RESTHEART_SERVICE_URL</code> variable
+            </li>
+            <li>Refresh this page to load your configured URL</li>
+            <li>Generate an admin JWT token from the admin webapp</li>
+            <li>Enter your JWT below and click "Setup Backend"</li>
+          </ol>
+        </div>
+
+        <div
+          id="configUrlDisplay"
+          class="alert"
+          style="
+            display: none;
+            background: #d4edda;
+            border-color: #27ae60;
+            color: #155724;
+          "
+        >
+          <strong>Configured Service URL:</strong>
+          <div
+            style="
+              font-family: &quot;Courier New&quot;, monospace;
+              margin-top: 8px;
+              word-break: break-all;
+            "
+            id="configUrlText"
+          ></div>
+        </div>
+
+        <div id="configRequiredAlert" class="alert error" style="display: none">
+          <strong>Configuration Required!</strong>
+          <p style="margin-top: 8px">
+            Please edit <code>config.js</code> and set your RESTHeart Cloud
+            service URL first.
+          </p>
+          <p style="margin-top: 8px">
+            Open <code>config.js</code> and replace the empty string with your
+            service URL:
+          </p>
+          <div
+            style="
+              background: #2d2d2d;
+              color: #f8f8f2;
+              padding: 12px;
+              border-radius: 4px;
+              font-family: &quot;Courier New&quot;, monospace;
+              font-size: 0.85rem;
+              margin-top: 8px;
+            "
+          >
+            const RESTHEART_SERVICE_URL = "https://your-instance.restheart.com";
+          </div>
+        </div>
+
+        <div
+          class="alert success"
+          id="successAlert"
+          style="display: none"
+        ></div>
+
+        <div class="alert error" id="errorAlert" style="display: none">
+          <strong>Error!</strong> <span id="errorMessage"></span>
+        </div>
+
+        <form id="setupForm">
+          <div class="form-group">
+            <label for="adminJwt">Admin JWT Token *</label>
+            <textarea
+              id="adminJwt"
+              name="adminJwt"
+              required
+              rows="6"
+              placeholder="Paste your admin JWT token here..."
+              style="
+                font-family: &quot;Courier New&quot;, Monaco, monospace;
+                font-size: 0.85rem;
+                word-break: break-all;
+              "
+            ></textarea>
+          </div>
+
+          <button type="submit">Setup Backend</button>
+        </form>
+
+        <div class="setup-progress" id="setupProgress">
+          <h3 style="margin-bottom: 16px">Setup Progress:</h3>
+          <div class="progress-item pending" id="step1">
+            <span class="status"></span>
+            <span>Creating /_schemas collection</span>
+          </div>
+          <div class="progress-item pending" id="step2">
+            <span class="status"></span>
+            <span>Adding contact schema</span>
+          </div>
+          <div class="progress-item pending" id="step3">
+            <span class="status"></span>
+            <span>Creating /contacts collection with validation</span>
+          </div>
+          <div class="progress-item pending" id="step4">
+            <span class="status"></span>
+            <span>Configuring permissions for unauthenticated POST</span>
+          </div>
+          <div class="progress-item pending" id="step5">
+            <span class="status"></span>
+            <span>Completing setup</span>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>
+          Powered by
+          <a href="https://restheart.org" target="_blank">RESTHeart Cloud</a>
+        </p>
+        <a href="index.html" class="back-link">← Back to Contact Form</a>
+      </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="assets/setup.js"></script>
+  </body>
+</html>

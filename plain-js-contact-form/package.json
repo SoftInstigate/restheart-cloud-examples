@@ -1,0 +1,17 @@
+{
+  "name": "plain-js-contact-form",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Plain JavaScript contact form using RESTHeart Cloud",
+  "scripts": {
+    "dev": "npx serve .",
+    "preview": "npx serve ."
+  },
+  "keywords": [
+    "restheart",
+    "contact-form",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT"
+}

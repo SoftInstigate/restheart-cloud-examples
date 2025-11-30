@@ -6,6 +6,22 @@ This monorepo contains example frontend applications that demonstrate how to bui
 
 ## Examples
 
+### Contact Form Application
+
+- **Plain JavaScript Contact Form** - Vanilla JavaScript form without framework dependencies
+
+A simple contact form that demonstrates:
+- Form submission with validation
+- /setup page to setup the backend
+- POST requests to RESTHeart Cloud
+- Using `application/x-www-form-urlencoded` content type
+- Email validation
+- Success/error handling
+
+TIP: you can also define a Webhook to receive notifications when the contact form is submitted.
+
+### Product Search Applications
+
 This repository includes three implementations of a Product Search application, each using a different frontend framework:
 
 - **[Vue.js](./vue-product-search)** - Modern progressive framework
@@ -21,7 +37,7 @@ All three implementations connect to the same RESTHeart Cloud backend and demons
 
 ## Prerequisites
 
-- Node.js 18+ and npm
+- npm or yarn
 - A RESTHeart Cloud instance (get started at [cloud.restheart.com](https://cloud.restheart.com))
 
 ## Quick Start
@@ -101,16 +117,27 @@ restheart-cloud-examples/
 │   │   └── environments/
 │   ├── .env.example
 │   └── README.md
+├── plain-js-contact-form/    # Plain JavaScript contact form
+│   ├── src/
+│   │   ├── config.js        # Endpoint configuration
+│   │   ├── app.js           # Form logic
+│   │   └── styles.css       # Styling
+│   ├── index.html
+│   └── README.md
 └── README.md                 # This file
 ```
 
-## Framework-Specific Documentation
+## Application-Specific Documentation
 
-Each framework directory contains its own README with specific instructions:
+Each application directory contains its own README with specific instructions:
 
+### Product Search Examples
 - [Vue.js Product Search](./vue-product-search/README.md)
 - [React Product Search](./react-product-search/README.md)
 - [Angular Product Search](./angular-product-search/README.md)
+
+### Contact Form Example
+- [Plain JavaScript Contact Form](./plain-js-contact-form/README.md)
 
 ## Features
 
