@@ -48,6 +48,9 @@
     type: "object",
     properties: {
       _id: {
+        _$oid: "string",
+      },
+      email: {
         type: "string",
         format: "email",
       },
@@ -68,7 +71,7 @@
         _$oid: "string",
       },
     },
-    required: ["_id", "message", "timestamp"],
+    required: ["email", "message", "timestamp"],
     additionalProperties: false,
   };
 

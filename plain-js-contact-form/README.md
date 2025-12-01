@@ -68,6 +68,9 @@ Create a document in `/_schemas` with `_id: "contact"`:
   "type": "object",
   "properties": {
     "_id": {
+      "_$oid": "string"
+    },
+    "email": {
       "type": "string",
       "format": "email"
     },
@@ -88,7 +91,7 @@ Create a document in `/_schemas` with `_id: "contact"`:
       "_$oid": "string"
     }
   },
-  "required": ["_id", "message", "timestamp"],
+  "required": ["email", "message", "timestamp"],
   "additionalProperties": false
 }
 ```
@@ -206,7 +209,7 @@ The form uses standard HTML form submission:
 <form action="https://your-instance.restheart.cloud/contact" 
       method="POST" 
       enctype="application/x-www-form-urlencoded">
-    <input type="email" name="_id" required>
+    <input type="email" name="email" required>
     <textarea name="message" required></textarea>
     <button type="submit">Send Message</button>
 </form>
@@ -230,10 +233,11 @@ When `assets/app.js` loads, it:
 ### Data Structure
 
 The client sends:
-- `_id`: Email address (validated as email format)
+- `email`: Email address (validated as email format)
 - `message`: The message text
 
 The server adds:
+- `_id`: Auto-generated MongoDB ObjectId
 - `timestamp`: Server-side timestamp with `$date` field
 
 ## Error Handling
@@ -290,7 +294,7 @@ Submits a contact form message.
 **Request:**
 - Content-Type: `application/x-www-form-urlencoded`
 - Body parameters:
-  - `_id` (string, email format): Email address
+  - `email` (string, email format): Email address
   - `message` (string): Message text
 
 **Response:**

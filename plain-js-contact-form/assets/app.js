@@ -4,7 +4,7 @@
   "use strict";
 
   const form = document.getElementById("contactForm");
-  const emailInput = document.getElementById("_id");
+  const emailInput = document.getElementById("email");
   const messageInput = document.getElementById("message");
   const submitBtn = form.querySelector('button[type="submit"]');
 
@@ -114,7 +114,7 @@
 
     // Prepare form data
     const formData = new URLSearchParams();
-    formData.append("_id", email);
+    formData.append("email", email);
     formData.append("message", message);
 
     setLoading(true);
